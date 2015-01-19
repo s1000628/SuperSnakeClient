@@ -1,3 +1,4 @@
+package snct_procon.supersnake;
 
 /**
  * 2ŽŸŒ³‚ÌˆÊ’u‚ð•\‚·.

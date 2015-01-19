@@ -1,3 +1,5 @@
+package snct_procon.supersnake;
+
 import java.util.*;
 
 /**

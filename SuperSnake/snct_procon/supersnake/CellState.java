@@ -1,3 +1,4 @@
+package snct_procon.supersnake;
 
 /**
  * SuperSnakeのセル(フィールド上の1マス)の状態を表す.

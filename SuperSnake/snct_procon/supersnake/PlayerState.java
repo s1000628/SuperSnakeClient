@@ -1,3 +1,4 @@
+package snct_procon.supersnake;
 
 /**
  * プレイヤーの状態を表す.

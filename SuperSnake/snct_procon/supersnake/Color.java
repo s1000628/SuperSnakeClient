@@ -1,3 +1,4 @@
+package snct_procon.supersnake;
 
 /**
  * RGB‚ÅF‚ğ•\‚·.
