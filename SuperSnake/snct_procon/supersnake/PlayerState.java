@@ -56,33 +56,33 @@ public class PlayerState {
     /**
      * プレイヤーの状態を初期化する.
      * @param name プレイヤーの名前
-     * @param position プレイヤーの位置
      * @param color プレイヤーの色
+     * @param position プレイヤーの位置
      * @param direction プレイヤーの向き
      * @param alive プレイヤーが生きているか否か
      */
-    public PlayerState(String name, Point position, Color color, Direction direction, boolean alive) {
+    public PlayerState(String name, Color color, Point position, Direction direction, boolean alive) {
         this.name = new String(name);
-        this.pos = position.clone();
         this.col = color.clone();
+        this.pos = position.clone();
         this.dir = direction;
         this.alive = alive;
     }
 
     private String name;
-    private Point pos;
     private Color col;
+    private Point pos;
     private Direction dir;
     private boolean alive;
     
     @Override
     public PlayerState clone() {
-        return new PlayerState(name, pos, col, dir, alive);
+        return new PlayerState(name, col, pos, dir, alive);
     }
 
     @Override
     public String toString() {
-        return "PlayerState [name=" + name + ", pos=" + pos + ", col=" + col
+        return "PlayerState [name=" + name + ", col=" + col + ", pos=" + pos
                 + ", dir=" + dir + ", alive=" + alive + "]";
     }
 
