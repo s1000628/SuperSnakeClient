@@ -38,39 +38,59 @@ public class PlayerState {
     }
     
     /**
+     * プレイヤーが生きているか否かを取得する.
+     * @return プレイヤーが生きていれば true 、そうでなければ false
+     */
+    public boolean isAlive() {
+        return alive;
+    }
+    
+    /**
+     * プレイヤーが死んでいるか否かを取得する.
+     * @return プレイヤーが死んでいれば true 、そうでなければ false
+     */
+    public boolean isDead() {
+        return !alive;
+    }
+    
+    /**
      * プレイヤーの状態を初期化する.
      * @param name プレイヤーの名前
      * @param position プレイヤーの位置
      * @param color プレイヤーの色
      * @param direction プレイヤーの向き
+     * @param alive プレイヤーが生きているか否か
      */
-    public PlayerState(String name, Point position, Color color, Direction direction) {
+    public PlayerState(String name, Point position, Color color, Direction direction, boolean alive) {
         this.name = new String(name);
         this.pos = position.clone();
         this.col = color.clone();
         this.dir = direction;
+        this.alive = alive;
     }
 
     private String name;
     private Point pos;
     private Color col;
     private Direction dir;
+    private boolean alive;
     
     @Override
     public PlayerState clone() {
-        return new PlayerState(name, pos, col, dir);
+        return new PlayerState(name, pos, col, dir, alive);
     }
 
     @Override
     public String toString() {
         return "PlayerState [name=" + name + ", pos=" + pos + ", col=" + col
-                + ", dir=" + dir + "]";
+                + ", dir=" + dir + ", alive=" + alive + "]";
     }
 
     @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
+        result = prime * result + (alive ? 1231 : 1237);
         result = prime * result + ((col == null) ? 0 : col.hashCode());
         result = prime * result + ((dir == null) ? 0 : dir.hashCode());
         result = prime * result + ((name == null) ? 0 : name.hashCode());
@@ -87,6 +107,8 @@ public class PlayerState {
         if (getClass() != obj.getClass())
             return false;
         PlayerState other = (PlayerState) obj;
+        if (alive != other.alive)
+            return false;
         if (col == null) {
             if (other.col != null)
                 return false;
