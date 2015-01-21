@@ -93,7 +93,7 @@ public class SuperSnakeClient {
                     default: d = Direction.RIGHT; break;
                     }
                     boolean alive = bis.read() == 0;
-                    players.add(new PlayerState(names.get(i), pos, colors.get(i), d));
+                    players.add(new PlayerState(names.get(i), pos, colors.get(i), d, alive));
                 }
                 System.out.println("OK");
                 
@@ -123,7 +123,12 @@ public class SuperSnakeClient {
                 System.out.println("oooooooooooooooooooo");
                 for (int i = 0; i < players.size(); ++i) {
                     PlayerState player = players.get(i);
-                    System.out.println(player.getName() + "(player" + i + "): " + player.getDirection().name());
+                    System.out.println(
+                        player.getName() + "(player" + i + "):"
+                        + (player.isDead() ? "(Ž€–S)" : "")
+                        + " (" + player.getPosition().getX() + ", " + player.getPosition().getY() + ")"
+                        + " " + player.getDirection().name()
+                        );
                 }
                 System.out.println("oooooooooooooooooooo");
                 
