@@ -4,7 +4,6 @@ import snct_procon.supersnake.net.*;
 
 import java.net.*;
 import java.io.*;
-import java.util.*;
 
 public class SuperSnakeClient {
 
