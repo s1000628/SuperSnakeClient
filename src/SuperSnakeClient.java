@@ -4,7 +4,6 @@ import snct_procon.supersnake.net.*;
 
 import java.net.*;
 import java.io.*;
-import java.util.*;
 
 public class SuperSnakeClient {
 
@@ -20,6 +19,7 @@ public class SuperSnakeClient {
             Sender sender = new Sender(socket.getOutputStream());
             Receiver receiver = new Receiver(socket.getInputStream());
             DataConverter data = new DataConverter();
+            boolean gameover = false;
             System.out.println("OK");
             
             System.out.println("©•ª‚Ìî•ñ‚ğ‘—M‚·‚é");
@@ -40,13 +40,20 @@ public class SuperSnakeClient {
             
             while (true) {
                 System.out.println("ƒQ[ƒ€‚Ìó‘Ô‚ğóM‚·‚é");
+                DataType type = DataType.UNKNOWN;
                 do {
                     receiver.beginReceive();
                     while (!receiver.isReceived()) {
                         Thread.sleep(10);
                     }
-                } while (receiver.getDataType() != DataType.GAME_STATE);
-                data.setGameState(receiver.getData());
+                    type = receiver.getDataType();
+                } while (type != DataType.GAME_STATE && type != DataType.GAME_RESULT);
+                if (type == DataType.GAME_STATE) {
+                    data.setGameState(receiver.getData());
+                } else if (type == DataType.GAME_RESULT) { 
+                    data.setGameResult(receiver.getData());
+                    gameover = true;
+                }
                 System.out.println("OK");
                 
                 System.out.println("[ Field State ]");
@@ -78,12 +85,24 @@ public class SuperSnakeClient {
                     System.out.println();
                 }
                 
+                if (gameover) {
+                    System.out.println("[ Ranking ]");
+                    for (int i = 0; i < playersCount; ++i) {
+                        PlayerState player = data.getPlayerState(i);
+                        System.out.println(
+                                player.getName() + "(player" + i + "):"
+                                + " " + data.getRank(i) + "ˆÊ"
+                            );
+                    }
+                    break;
+                }
+                
                 System.out.println("[ Players State ]");
                 for (int i = 0; i < playersCount; ++i) {
                     PlayerState player = data.getPlayerState(i);
                     System.out.println(
                         player.getName() + "(player" + i + "):"
-                        + (player.isDead() ? "(€–S)" : "")
+                        + (player.isDead() ? " (€–S)" : "")
                         + " (" + player.getPosition().getX() + ", " + player.getPosition().getY() + ")"
                         + " " + player.getDirection().name()
                         );
