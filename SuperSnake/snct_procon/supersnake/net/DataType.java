@@ -30,6 +30,12 @@ public enum DataType {
      */
     PLAYER_INFO(4),
     
+    /**
+     * サーバーからプレイヤーにゲームの結果を送信する.
+     * ゲーム終了後に一度だけ送信される.
+     */
+    GAME_RESULT(5),
+    
     ;
     
     /**
