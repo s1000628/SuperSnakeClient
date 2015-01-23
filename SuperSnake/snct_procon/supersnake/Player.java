@@ -1,0 +1,95 @@
+package snct_procon.supersnake;
+
+import java.util.*;
+
+public abstract class Player {
+    
+    /**
+     * ゲームの状態からプレイヤーの行動を決定する.
+     * サブクラスで実装する必要がある.
+     * @param state ゲームの状態
+     * @return プレイヤーの行動
+     */
+    public abstract Action think(GameState state);
+    
+    /**
+     * ゲームの結果を表示する.
+     * サブクラスでオーバーライドすれば、自由な形式で表示できる.
+     * @param state ゲームの状態
+     * @param rank 各プレイヤーの順位
+     */
+    public void showResult(GameState state, List<Integer> rank) {
+        // フィールドの状態
+        System.out.println("[ Field ]");
+
+        FieldState field = state.GetFieldState();
+        int width = field.getSize().getWidth();
+        int height = field.getSize().getHeight();
+        int playersCount = state.GetPlayerCount();
+        
+        for (int y = 0; y < height; ++y) {
+            for (int x = 0; x < width; ++x) {
+                int p = -1;
+                
+                // 位置(x, y)にプレイヤーがいるか確認
+                for (int i = 0; i < playersCount; ++i) {
+                    Point pos = state.GetPlayerState(i).getPosition();
+                    if (pos.getX() == x && pos.getY() == y) {
+                        p = i;
+                        break;
+                    }
+                }
+                
+                if (p >= 0) {
+                    // プレイヤーがいたらプレイヤー番号を出力
+                    System.out.print(p);
+                } else {
+                    // プレイヤーがいなかったら通行可能か否かを出力
+                    if (field.getCellState(x, y).isPassable()) {
+                        System.out.print("_");
+                    } else {
+                        System.out.print("X");
+                    }
+                }
+            }
+            
+            System.out.println();
+        }
+        
+        // 順位
+        System.out.println("[ Ranking ]");
+        for (int i = 0; i < playersCount; ++i) {
+            String name = state.GetPlayerState(i).getName();
+            System.out.println(name + "(player" + i + "): " + rank.get(i) + "位");
+        }
+    }
+    
+    /**
+     * プレイヤーを初期化する.
+     * @param name プレイヤーの名前
+     * @param color プレイヤーの色
+     */
+    public Player(String name, Color color) {
+        this.name = new String(name);
+        this.color = color.clone();
+    }
+    
+    /**
+     * プレイヤーの名前を取得する.
+     * @return プレイヤーの名前
+     */
+    public String getName() {
+        return new String(name);
+    }
+    
+    /**
+     * プレイヤーの色を取得する.
+     * @return プレイヤーの色
+     */
+    public Color getColor() {
+        return color;
+    }
+    
+    private String name;
+    private Color color;
+}

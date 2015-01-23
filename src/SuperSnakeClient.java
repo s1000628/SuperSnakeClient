@@ -1,124 +1,97 @@
 
+import java.io.*;
+import java.net.*;
+import java.util.*;
 import snct_procon.supersnake.*;
 import snct_procon.supersnake.net.*;
 
-import java.net.*;
-import java.io.*;
-
 public class SuperSnakeClient {
-
-    public static void main(String[] args) throws IOException, InterruptedException {
-        BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
-        Socket socket = null;
-        try {
-            final String host = "localhost";
-            final int port = 12345;
-            
-            System.out.println(host + ":" + port + " に接続する");
-            socket = new Socket(host, port);
-            Sender sender = new Sender(socket.getOutputStream());
-            Receiver receiver = new Receiver(socket.getInputStream());
-            DataConverter data = new DataConverter();
-            boolean gameover = false;
-            System.out.println("OK");
-            
-            System.out.println("自分の情報を送信する");
-            data.setMyPlayerName("Java太郎");
-            data.setMyPlayerColor(new Color(0, 255, 0));
-            sender.beginSend(DataType.PLAYER_INFO, data.getPlayerInfoBytes());
-            System.out.println("OK");
-            
-            System.out.println("ゲームの情報を受信する");
+    
+    public SuperSnakeClient(Player player) {
+        this.player = player;
+    }
+    
+    /**
+     * SuperSnake サーバーに接続する.
+     * 接続の確立、プレイヤー情報の送信、ゲーム情報の受信を行う.
+     * @param host 接続先ホスト名
+     * @param port 接続先ポート番号
+     * @throws IOException
+     * @throws InterruptedException
+     */
+    public void connect(String host, int port) throws IOException, InterruptedException {
+        // 接続
+        socket = new Socket(host, port);
+        sender = new Sender(socket.getOutputStream());
+        receiver = new Receiver(socket.getInputStream());
+        
+        // 自分の情報を送信
+        data.setMyPlayerName(player.getName());
+        data.setMyPlayerColor(player.getColor());
+        sender.beginSend(DataType.PLAYER_INFO, data.getPlayerInfoBytes());
+        
+        // ゲームの情報を受信
+        do {
             receiver.beginReceive();
-            do {
-                while (!receiver.isReceived()) {
-                    Thread.sleep(10);
-                }
-            } while (receiver.getDataType() != DataType.GAME_INFO);
-            data.setGameInfo(receiver.getData());
-            System.out.println("OK");
-            
-            while (true) {
-                System.out.println("ゲームの状態を受信する");
-                DataType type = DataType.UNKNOWN;
-                do {
-                    receiver.beginReceive();
-                    while (!receiver.isReceived()) {
-                        Thread.sleep(10);
-                    }
-                    type = receiver.getDataType();
-                } while (type != DataType.GAME_STATE && type != DataType.GAME_RESULT);
-                if (type == DataType.GAME_STATE) {
-                    data.setGameState(receiver.getData());
-                } else if (type == DataType.GAME_RESULT) { 
-                    data.setGameResult(receiver.getData());
-                    gameover = true;
-                }
-                System.out.println("OK");
-                
-                System.out.println("[ Field State ]");
-                FieldState field = data.getFieldState();
-                Size size = field.getSize();
-                int width = size.getWidth();
-                int height = size.getHeight();
-                int playersCount = data.getPlayersCount();
-                for (int y = 0; y < height; ++y) {
-                    for (int x = 0; x < width; ++x) {
-                        int p = -1;
-                        for (int i = 0; i < playersCount; ++i) {
-                            Point pos = data.getPlayerState(i).getPosition();
-                            if (pos.getX() == x && pos.getY() == y) {
-                                p = i;
-                                break;
-                            }
-                        }
-                        if (p >= 0) {
-                            System.out.print(p);
-                        } else {
-                            if (field.getCellState(x, y).isPassable()) {
-                                System.out.print("_");
-                            } else {
-                                System.out.print("X");
-                            }
-                        }
-                    }
-                    System.out.println();
-                }
-                
-                if (gameover) {
-                    System.out.println("[ Ranking ]");
-                    for (int i = 0; i < playersCount; ++i) {
-                        PlayerState player = data.getPlayerState(i);
-                        System.out.println(
-                                player.getName() + "(player" + i + "):"
-                                + " " + data.getRank(i) + "位"
-                            );
-                    }
-                    break;
-                }
-                
-                System.out.println("[ Players State ]");
-                for (int i = 0; i < playersCount; ++i) {
-                    PlayerState player = data.getPlayerState(i);
-                    System.out.println(
-                        player.getName() + "(player" + i + "):"
-                        + (player.isDead() ? " (死亡)" : "")
-                        + " (" + player.getPosition().getX() + ", " + player.getPosition().getY() + ")"
-                        + " " + player.getDirection().name()
-                        );
-                }
-                
-                System.out.println("[ Action ]");
-                System.out.print("0:直進 | 1:左 | 2:右>");
-                byte action = Byte.parseByte(in.readLine());
-                sender.beginSend(DataType.ANSWER, new byte[] { action });
+            while (!receiver.isReceived()) {
+                Thread.sleep(10);
             }
-        }
-        finally {
-            if (socket != null) {
-                socket.close();
+        } while (receiver.getDataType() != DataType.GAME_INFO);
+        data.setGameInfo(receiver.getData());
+    }
+    
+    /**
+     * 次のターンが開始するまで待機する.
+     * ゲームの状態またはゲームの結果を受信するまで待機する.
+     * @throws InterruptedException
+     * @throws IOException
+     */
+    public void waitForNextTurn() throws InterruptedException, IOException {
+        do {
+            receiver.beginReceive();
+            while (!receiver.isReceived()) {
+                Thread.sleep(10);
             }
+        } while (receiver.getDataType() != DataType.GAME_STATE && receiver.getDataType() != DataType.GAME_RESULT);
+        if (receiver.getDataType() == DataType.GAME_STATE) {
+            data.setGameState(receiver.getData());
+        } else if (receiver.getDataType() == DataType.GAME_RESULT) {
+            data.setGameResult(receiver.getData());
         }
     }
+    
+    /**
+     * 次の行動を決定する.
+     * @throws IOException
+     */
+    public void decideAction() throws IOException {
+        Action action = player.think(data.getGameState());
+        sender.beginSend(DataType.ANSWER, data.getActionBytes(action));
+    }
+    
+    /**
+     * ゲームの結果を表示する.
+     * isGameover() が true の状態で呼び出さなければならない.
+     */
+    public void showResult() {
+        List<Integer> rank = new ArrayList<Integer>();
+        for (int i = 0; i < data.getPlayersCount(); ++i) {
+            rank.add(data.getRank(i));
+        }
+        player.showResult(data.getGameState(), rank);
+    }
 
+    /**
+     * ゲームが終了しているか否かを取得する.
+     * @return ゲームが終了していれば true 、そうでなければ false
+     */
+    public boolean isGameover() {
+        return data.isGameover();
+    }
+    
+    Socket socket;
+    Sender sender;
+    Receiver receiver;
+    DataConverter data = new DataConverter();
+    Player player;
 }

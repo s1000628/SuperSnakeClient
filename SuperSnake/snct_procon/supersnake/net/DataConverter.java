@@ -71,6 +71,26 @@ public class DataConverter {
     }
     
     /**
+     * ゲームが終了しているか否かを取得する.
+     * @return ゲームが終了していれば true 、そうでなければ false
+     */
+    public boolean isGameover() {
+        return gameover;
+    }
+    
+    /**
+     * ゲームの状態を取得する.
+     * @return ゲームの状態
+     */
+    public GameState getGameState() {
+        List<PlayerState> playerStates = new ArrayList<PlayerState>();
+        for (PlayerState player : players) {
+            playerStates.add(player);
+        }
+        return new GameState(field, playerStates);
+    }
+    
+    /**
      * プレイヤーの情報送信用のバイト列を生成する.
      * @return 送信用バイト列
      * @throws IOException
@@ -82,6 +102,22 @@ public class DataConverter {
         bos.write(myColor.getG());
         bos.write(myColor.getB());
         return bos.toByteArray();
+    }
+    
+    /**
+     * プレイヤーの行動送信用のバイト列を生成する.
+     * @param action プレイヤーの行動
+     * @return 送信用バイト列
+     * @throws IOException
+     */
+    public byte[] getActionBytes(Action action) throws IOException {
+        byte res = 0;
+        switch (action) {
+        case STRAIGHT: res = 0; break; 
+        case LEFT: res = 1; break;
+        case RIGHT: res = 2; break;
+        }
+        return new byte[] { res };
     }
     
     /**
@@ -278,6 +314,9 @@ public class DataConverter {
         for (int i = 0; i < n; ++i) {
             rank[i] = Receiver.readInt32(bis);
         }
+        
+        // ゲームオーバー
+        gameover = true;
     }
     
     private String myName;
@@ -286,4 +325,5 @@ public class DataConverter {
     private FieldState field;
     private PlayerState[] players;
     private int[] rank;
+    private boolean gameover = false;
 }
