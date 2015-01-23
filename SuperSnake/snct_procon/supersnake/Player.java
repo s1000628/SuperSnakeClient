@@ -68,9 +68,25 @@ public abstract class Player {
         
         // èáà 
         System.out.println("[ Ranking ]");
+        int maxVal = 0;
         for (int i = 0; i < playersCount; ++i) {
-            String name = state.getPlayerState(i).getName();
-            System.out.println(name + "(player" + i + "): " + rank.get(i) + "à ");
+            if (rank.get(i) > maxVal) {
+                maxVal = rank.get(i);
+            }
+        }
+        List<List<Integer>> rankSorted = new ArrayList<List<Integer>>();
+        for (int r = 0; r < maxVal; ++r) {
+            rankSorted.add(new ArrayList<Integer>());
+        }
+        for (int i = 0; i < playersCount; ++i) {
+            rankSorted.get(rank.get(i) - 1).add(i);
+        }
+        for (int r = 0; r < maxVal; ++r) {
+            System.out.println((r + 1) + "à :");
+            for (Integer i : rankSorted.get(r)) {
+                String name = state.getPlayerState(i).getName();
+                System.out.println("  " + name + "(player" + i + ")");
+            }
         }
     }
     
