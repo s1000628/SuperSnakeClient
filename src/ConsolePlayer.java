@@ -85,7 +85,6 @@ public class ConsolePlayer extends Player {
                 }
                 break;
             }
-            in.close();
         } catch (IOException ex) {
             System.out.println(ex);
         }
