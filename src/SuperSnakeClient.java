@@ -2,10 +2,12 @@
 import java.io.*;
 import java.net.*;
 import java.util.*;
+import java.lang.*;
+
 import snct_procon.supersnake.*;
 import snct_procon.supersnake.net.*;
 
-public class SuperSnakeClient {
+public class SuperSnakeClient implements AutoCloseable {
     
     public SuperSnakeClient(Player player) {
         this.player = player;
@@ -87,6 +89,18 @@ public class SuperSnakeClient {
      */
     public boolean isGameover() {
         return data.isGameover();
+    }
+
+    @Override
+    public void close() {
+        if (socket != null) {
+            try {
+                socket.close();
+                socket = null;
+            }
+            catch (IOException ex) {
+            }
+        }
     }
     
     Socket socket;

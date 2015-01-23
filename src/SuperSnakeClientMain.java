@@ -14,23 +14,24 @@ public class SuperSnakeClientMain {
 
         // プレイヤー
         Player player = new ConsolePlayer();
-        SuperSnakeClient client = new SuperSnakeClient(player);
         
-        // 接続
-        client.connect(host, port);
-        
-        while (true) {
-            // 次のターンの開始待ち
-            client.waitForNextTurn();
+        try (SuperSnakeClient client = new SuperSnakeClient(player)) {
+            // 接続
+            client.connect(host, port);
             
-            // ゲームが終了したら、ゲームの結果を表示して終了
-            if (client.isGameover()) {
-                client.showResult();
-                break;
+            while (true) {
+                // 次のターンの開始待ち
+                client.waitForNextTurn();
+                
+                // ゲームが終了したら、ゲームの結果を表示して終了
+                if (client.isGameover()) {
+                    client.showResult();
+                    break;
+                }
+                
+                // 行動を考える
+                client.decideAction();
             }
-            
-            // 行動を考える
-            client.decideAction();
         }
     }
 
