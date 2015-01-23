@@ -13,6 +13,16 @@ public abstract class Player {
     public abstract Action think(GameState state);
     
     /**
+     * プレイヤーを初期化する.
+     * @param name プレイヤーの名前
+     * @param color プレイヤーの色
+     */
+    public Player(String name, Color color) {
+        this.name = new String(name);
+        this.color = color.clone();
+    }
+    
+    /**
      * ゲームの結果を表示する.
      * サブクラスでオーバーライドすれば、自由な形式で表示できる.
      * @param state ゲームの状態
@@ -22,10 +32,10 @@ public abstract class Player {
         // フィールドの状態
         System.out.println("[ Field ]");
 
-        FieldState field = state.GetFieldState();
+        FieldState field = state.getFieldState();
         int width = field.getSize().getWidth();
         int height = field.getSize().getHeight();
-        int playersCount = state.GetPlayerCount();
+        int playersCount = state.getPlayersCount();
         
         for (int y = 0; y < height; ++y) {
             for (int x = 0; x < width; ++x) {
@@ -33,7 +43,7 @@ public abstract class Player {
                 
                 // 位置(x, y)にプレイヤーがいるか確認
                 for (int i = 0; i < playersCount; ++i) {
-                    Point pos = state.GetPlayerState(i).getPosition();
+                    Point pos = state.getPlayerState(i).getPosition();
                     if (pos.getX() == x && pos.getY() == y) {
                         p = i;
                         break;
@@ -59,19 +69,9 @@ public abstract class Player {
         // 順位
         System.out.println("[ Ranking ]");
         for (int i = 0; i < playersCount; ++i) {
-            String name = state.GetPlayerState(i).getName();
+            String name = state.getPlayerState(i).getName();
             System.out.println(name + "(player" + i + "): " + rank.get(i) + "位");
         }
-    }
-    
-    /**
-     * プレイヤーを初期化する.
-     * @param name プレイヤーの名前
-     * @param color プレイヤーの色
-     */
-    public Player(String name, Color color) {
-        this.name = new String(name);
-        this.color = color.clone();
     }
     
     /**

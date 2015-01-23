@@ -11,7 +11,7 @@ public class GameState {
      * フィールドの状態を取得する.
      * @return フィールドの状態
      */
-    public FieldState GetFieldState() {
+    public FieldState getFieldState() {
         return field;
     }
     
@@ -20,7 +20,7 @@ public class GameState {
      * @param playerIndex プレイヤー番号[0, プレイヤー数 - 1]
      * @return プレイヤーの状態
      */
-    public PlayerState GetPlayerState(int playerIndex) {
+    public PlayerState getPlayerState(int playerIndex) {
         return players.get(playerIndex);
     }
     
@@ -28,7 +28,7 @@ public class GameState {
      * プレイヤーの人数を取得する.
      * @return プレイヤーの人数
      */
-    public int GetPlayerCount() {
+    public int getPlayersCount() {
         return players.size();
     }
     

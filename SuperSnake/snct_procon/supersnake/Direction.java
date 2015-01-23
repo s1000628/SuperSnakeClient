@@ -4,6 +4,7 @@ package snct_procon.supersnake;
  * 8•ûŒü‚ÌŒü‚«‚ð•\‚·.
  */
 public enum Direction {
+    
     /**
      * ‰E.
      */
