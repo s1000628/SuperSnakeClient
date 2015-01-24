@@ -26,7 +26,7 @@ public abstract class Player {
      * ゲームの状態を表示する.
      * プレイヤーの生死に関わらず、毎ターンの始めに呼び出される.
      * サブクラスでオーバーライドすれば、自由な形式で表示できる.
-     * @param state
+     * @param state ゲームの状態
      */
     public void showGameState(GameState state) {
         // フィールドの状態
