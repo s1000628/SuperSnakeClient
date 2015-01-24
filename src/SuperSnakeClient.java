@@ -8,6 +8,11 @@ import snct_procon.supersnake.net.*;
 
 public class SuperSnakeClient implements AutoCloseable {
     
+    /**
+     * ポート番号を指定しなかった場合に使用するポート番号
+     */
+    public final int defaultPort = 12345;
+    
     public SuperSnakeClient(Player player) {
         this.player = player;
     }
@@ -39,6 +44,23 @@ public class SuperSnakeClient implements AutoCloseable {
             }
         } while (receiver.getDataType() != DataType.GAME_INFO);
         data.setGameInfo(receiver.getData());
+    }
+
+    /**
+     * SuperSnake サーバーに接続する.
+     * 接続の確立、プレイヤー情報の送信、ゲーム情報の受信を行う.
+     * @param serverName 接続先
+     * @throws IOException ソケット等での入出力エラー発生時に発生する.
+     * @throws InterruptedException 割り込み発生時に発生する.
+     * @throws NumberFormatException ポート番号が不正の場合に発生する.
+     */
+    public void connect(String serverName) throws IOException, InterruptedException, NumberFormatException {
+        String[] sp = serverName.split(":");
+        if (sp.length >= 2) {
+            this.connect(sp[0], Integer.parseInt(sp[1]));
+        } else {
+            this.connect(sp[0], defaultPort);
+        }
     }
     
     /**
