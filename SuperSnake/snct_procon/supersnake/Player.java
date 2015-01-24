@@ -21,6 +21,31 @@ public abstract class Player {
         this.name = new String(name);
         this.color = color.clone();
     }
+
+    /**
+     * ゲームの状態を表示する.
+     * プレイヤーの生死に関わらず、毎ターンの始めに呼び出される.
+     * サブクラスでオーバーライドすれば、自由な形式で表示できる.
+     * @param state
+     */
+    public void showGameState(GameState state) {
+        // フィールドの状態
+        System.out.println("[ Field ]");
+        showField(state);
+        
+        // プレイヤーの状態
+        System.out.println("[ Players ]");
+        int playersCount = state.getPlayersCount();
+        for (int i = 0; i < playersCount; ++i) {
+            PlayerState player = state.getPlayerState(i);
+            System.out.println(
+                player.getName() + "(player" + i + "):"
+                + (player.isDead() ? " (死亡)" : "")
+                + " (" + player.getPosition().getX() + ", " + player.getPosition().getY() + ")"
+                + " " + player.getDirection().name()
+                );
+        }
+    }
     
     /**
      * ゲームの結果を表示する.
@@ -31,7 +56,34 @@ public abstract class Player {
     public void showResult(GameState state, List<Integer> rank) {
         // フィールドの状態
         System.out.println("[ Field ]");
+        showField(state);
+        
+        // 順位
+        System.out.println("[ Ranking ]");
+        int playersCount = state.getPlayersCount();
+        int maxVal = 0;
+        for (int i = 0; i < playersCount; ++i) {
+            if (rank.get(i) > maxVal) {
+                maxVal = rank.get(i);
+            }
+        }
+        List<List<Integer>> rankSorted = new ArrayList<List<Integer>>();
+        for (int r = 0; r < maxVal; ++r) {
+            rankSorted.add(new ArrayList<Integer>());
+        }
+        for (int i = 0; i < playersCount; ++i) {
+            rankSorted.get(rank.get(i) - 1).add(i);
+        }
+        for (int r = 0; r < maxVal; ++r) {
+            System.out.println((r + 1) + "位:");
+            for (Integer i : rankSorted.get(r)) {
+                String name = state.getPlayerState(i).getName();
+                System.out.println("  " + name + "(player" + i + ")");
+            }
+        }
+    }
 
+    private void showField(GameState state) {
         FieldState field = state.getFieldState();
         int width = field.getSize().getWidth();
         int height = field.getSize().getHeight();
@@ -64,29 +116,6 @@ public abstract class Player {
             }
             
             System.out.println();
-        }
-        
-        // 順位
-        System.out.println("[ Ranking ]");
-        int maxVal = 0;
-        for (int i = 0; i < playersCount; ++i) {
-            if (rank.get(i) > maxVal) {
-                maxVal = rank.get(i);
-            }
-        }
-        List<List<Integer>> rankSorted = new ArrayList<List<Integer>>();
-        for (int r = 0; r < maxVal; ++r) {
-            rankSorted.add(new ArrayList<Integer>());
-        }
-        for (int i = 0; i < playersCount; ++i) {
-            rankSorted.get(rank.get(i) - 1).add(i);
-        }
-        for (int r = 0; r < maxVal; ++r) {
-            System.out.println((r + 1) + "位:");
-            for (Integer i : rankSorted.get(r)) {
-                String name = state.getPlayerState(i).getName();
-                System.out.println("  " + name + "(player" + i + ")");
-            }
         }
     }
     

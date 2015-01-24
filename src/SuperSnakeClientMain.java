@@ -1,8 +1,5 @@
 
 import snct_procon.supersnake.*;
-import snct_procon.supersnake.net.*;
-
-import java.net.*;
 import java.io.*;
 
 public class SuperSnakeClientMain {
@@ -29,8 +26,13 @@ public class SuperSnakeClientMain {
                     break;
                 }
                 
+                // ゲームの状態を表示
+                client.showGameState();
+                
                 // 行動を考える
-                client.decideAction();
+                if (client.isAlive()) {
+                    client.decideAction();
+                }
             }
         }
     }

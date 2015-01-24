@@ -10,55 +10,6 @@ public class ConsolePlayer extends Player {
 
     @Override
     public Action think(GameState state) {
-        // フィールドの状態を表示
-        System.out.println("[ Field ]");
-
-        FieldState field = state.getFieldState();
-        int width = field.getSize().getWidth();
-        int height = field.getSize().getHeight();
-        int playersCount = state.getPlayersCount();
-        
-        for (int y = 0; y < height; ++y) {
-            for (int x = 0; x < width; ++x) {
-                int p = -1;
-                
-                // 位置(x, y)にプレイヤーがいるか確認
-                for (int i = 0; i < playersCount; ++i) {
-                    Point pos = state.getPlayerState(i).getPosition();
-                    if (pos.getX() == x && pos.getY() == y) {
-                        p = i;
-                        break;
-                    }
-                }
-                
-                if (p >= 0) {
-                    // プレイヤーがいたらプレイヤー番号を出力
-                    System.out.print(p);
-                } else {
-                    // プレイヤーがいなかったら通行可能か否かを出力
-                    if (field.getCellState(x, y).isPassable()) {
-                        System.out.print("_");
-                    } else {
-                        System.out.print("X");
-                    }
-                }
-            }
-            
-            System.out.println();
-        }
-        
-        // 各プレイヤーの状態を表示
-        System.out.println("[ Players State ]");
-        for (int i = 0; i < playersCount; ++i) {
-            PlayerState player = state.getPlayerState(i);
-            System.out.println(
-                player.getName() + "(player" + i + "):"
-                + (player.isDead() ? " (死亡)" : "")
-                + " (" + player.getPosition().getX() + ", " + player.getPosition().getY() + ")"
-                + " " + player.getDirection().name()
-                );
-        }
-        
         // 行動を入力
         System.out.println("[ Action ]");
         Action action = Action.STRAIGHT;

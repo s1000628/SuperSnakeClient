@@ -2,7 +2,6 @@
 import java.io.*;
 import java.net.*;
 import java.util.*;
-import java.lang.*;
 
 import snct_procon.supersnake.*;
 import snct_procon.supersnake.net.*;
@@ -72,6 +71,13 @@ public class SuperSnakeClient implements AutoCloseable {
     }
     
     /**
+     * ゲームの状態を表示する.
+     */
+    public void showGameState() {
+        player.showGameState(data.getGameState());
+    }
+    
+    /**
      * ゲームの結果を表示する.
      * isGameover() が true の状態で呼び出さなければならない.
      */
@@ -89,6 +95,14 @@ public class SuperSnakeClient implements AutoCloseable {
      */
     public boolean isGameover() {
         return data.isGameover();
+    }
+    
+    /**
+     * プレイヤーが生きているか否かを取得する.
+     * @return プレイヤーが生きていれば true 、そうでなければ false
+     */
+    public boolean isAlive() {
+        return data.getPlayerState(data.getMyPlayerNumber()).isAlive();
     }
 
     @Override
