@@ -57,7 +57,7 @@ public class Sender {
      * 数値を送信用データに変換して OutputStream に書き込む.
      * @param stream 書き込み先 OutputStream
      * @param data 書き込む数値
-     * @throws IOException
+     * @throws IOException OutputStream への書き込みエラーが発生した場合に throw される.
      */
     public static void writeInt32(OutputStream stream, int data) throws IOException {
         ByteBuffer buf = ByteBuffer.allocate(4);
@@ -70,7 +70,7 @@ public class Sender {
      * 文字列を送信用データに変換して OutputStream に書き込む.
      * @param stream 書き込み先 OutputStream
      * @param data 書き込む文字列
-     * @throws IOException
+     * @throws IOException OutputStream への書き込みエラーが発生した場合に throw される.
      */
     public static void writeString(OutputStream stream, String data) throws IOException {
         byte[] buf = data.getBytes("UTF-8");

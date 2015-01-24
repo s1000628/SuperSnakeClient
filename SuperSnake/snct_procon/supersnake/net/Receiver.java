@@ -60,7 +60,7 @@ public class Receiver {
      * 受信したデータから数値を取り出す.
      * @param stream 受信したデータの InputStream
      * @return 受信した数値
-     * @throws IOException
+     * @throws IOException InputStream からの読み出しエラーが発生した場合に throw される.
      */
     public static int readInt32(InputStream stream) throws IOException {
         byte[] buf = new byte[4];
@@ -74,7 +74,7 @@ public class Receiver {
      * 受信したデータから文字列を取り出す.
      * @param stream 受信したデータの InputStream
      * @return 受信した文字列
-     * @throws IOException
+     * @throws IOException InputStream からの読み出しエラーが発生した場合に throw される.
      */
     public static String readString(InputStream stream) throws IOException {
         int len = readInt32(stream);

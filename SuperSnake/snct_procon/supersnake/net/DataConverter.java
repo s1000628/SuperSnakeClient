@@ -93,11 +93,15 @@ public class DataConverter {
     /**
      * プレイヤーの情報送信用のバイト列を生成する.
      * @return 送信用バイト列
-     * @throws IOException
      */
-    public byte[] getPlayerInfoBytes() throws IOException {
+    public byte[] getPlayerInfoBytes() {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        Sender.writeString(bos, myName);
+        try {
+            Sender.writeString(bos, myName);
+        }
+        catch (IOException ex) {
+            // ByteArrayOutputStream.write() の呼び出しなので IO エラーは発生しない
+        }
         bos.write(myColor.getR());
         bos.write(myColor.getG());
         bos.write(myColor.getB());
@@ -108,9 +112,8 @@ public class DataConverter {
      * プレイヤーの行動送信用のバイト列を生成する.
      * @param action プレイヤーの行動
      * @return 送信用バイト列
-     * @throws IOException
      */
-    public byte[] getActionBytes(Action action) throws IOException {
+    public byte[] getActionBytes(Action action) {
         byte res = 0;
         switch (action) {
         case STRAIGHT: res = 0; break; 
@@ -123,200 +126,212 @@ public class DataConverter {
     /**
      * 受信データからゲームの情報を設定する.
      * @param data 受信データのバイト列
-     * @throws IOException
      */
-    public void setGameInfo(byte[] data) throws IOException {
+    public void setGameInfo(byte[] data) {
         ByteArrayInputStream bis = new ByteArrayInputStream(data);
         
-        // フィールド名
-        String fieldName = Receiver.readString(bis);
-        
-        // フィールドサイズ
-        int w = Receiver.readInt32(bis);
-        int h = Receiver.readInt32(bis);
-        Size fieldSize = new Size(w, h);
-        
-        List<List<CellState>> cells = new ArrayList<List<CellState>>();
-        for (int x = 0; x < w; ++x) {
-            List<CellState> row = new ArrayList<CellState>();
-            for (int y = 0; y < h; ++y) {
-                row.add(new CellState(true, new Color(0, 0, 0)));
-            }
-            cells.add(row);
-        }
-        field = new FieldState(fieldName, fieldSize, cells);
-        
-        // プレイヤー人数
-        int n = Receiver.readInt32(bis);
-        players = new PlayerState[n];
-        
-        // プレイヤー
-        for (int i = 0; i < n; ++i) {
-            // プレイヤーの名前
-            String name = Receiver.readString(bis);
+        try {
+            // フィールド名
+            String fieldName = Receiver.readString(bis);
             
-            // プレイヤーの色
-            int r = bis.read();
-            int g = bis.read();
-            int b = bis.read();
-            Color color = new Color(r, g, b);
+            // フィールドサイズ
+            int w = Receiver.readInt32(bis);
+            int h = Receiver.readInt32(bis);
+            Size fieldSize = new Size(w, h);
             
-            players[i] = new PlayerState(name, color, new Point(0, 0), Direction.RIGHT, true);
-        }
-        
-        // 自分のプレイヤー番号
-        myPlayerNum = Receiver.readInt32(bis);
-    }
-  
-    /**
-     * 受信データからゲームの状態を設定する.
-     * @param data 受信データのバイト列
-     * @throws IOException
-     */
-    public void setGameState(byte[] data) throws IOException {
-        ByteArrayInputStream bis = new ByteArrayInputStream(data);
-        
-        // フィールドサイズ
-        int w = Receiver.readInt32(bis);
-        int h = Receiver.readInt32(bis);
-        Size size = new Size(w, h);
-        
-        // セル
-        CellState[][] cellsArr = new CellState[w][h];
-        for (int y = 0; y < h; ++y) {
+            List<List<CellState>> cells = new ArrayList<List<CellState>>();
             for (int x = 0; x < w; ++x) {
-                // 通行可能フラグ
-                boolean passable = (bis.read() != 0);
+                List<CellState> row = new ArrayList<CellState>();
+                for (int y = 0; y < h; ++y) {
+                    row.add(new CellState(true, new Color(0, 0, 0)));
+                }
+                cells.add(row);
+            }
+            field = new FieldState(fieldName, fieldSize, cells);
+            
+            // プレイヤー人数
+            int n = Receiver.readInt32(bis);
+            players = new PlayerState[n];
+            
+            // プレイヤー
+            for (int i = 0; i < n; ++i) {
+                // プレイヤーの名前
+                String name = Receiver.readString(bis);
                 
-                // 色
+                // プレイヤーの色
                 int r = bis.read();
                 int g = bis.read();
                 int b = bis.read();
                 Color color = new Color(r, g, b);
                 
-                cellsArr[x][y] = new CellState(passable, color);
+                players[i] = new PlayerState(name, color, new Point(0, 0), Direction.RIGHT, true);
             }
+            
+            // 自分のプレイヤー番号
+            myPlayerNum = Receiver.readInt32(bis);
         }
-        List<List<CellState>> cells = new ArrayList<List<CellState>>();
-        for (int x = 0; x < w; ++x) {
-            List<CellState> row = new ArrayList<CellState>();
+        catch (IOException ex) {
+            // ByteArrayInputStream.read() の呼び出しなので IO エラーは発生しない
+        }
+    }
+  
+    /**
+     * 受信データからゲームの状態を設定する.
+     * @param data 受信データのバイト列
+     */
+    public void setGameState(byte[] data) {
+        ByteArrayInputStream bis = new ByteArrayInputStream(data);
+        
+        try {
+            // フィールドサイズ
+            int w = Receiver.readInt32(bis);
+            int h = Receiver.readInt32(bis);
+            Size size = new Size(w, h);
+            
+            // セル
+            CellState[][] cellsArr = new CellState[w][h];
             for (int y = 0; y < h; ++y) {
-                row.add(cellsArr[x][y]);
+                for (int x = 0; x < w; ++x) {
+                    // 通行可能フラグ
+                    boolean passable = (bis.read() != 0);
+                    
+                    // 色
+                    int r = bis.read();
+                    int g = bis.read();
+                    int b = bis.read();
+                    Color color = new Color(r, g, b);
+                    
+                    cellsArr[x][y] = new CellState(passable, color);
+                }
             }
-            cells.add(row);
+            List<List<CellState>> cells = new ArrayList<List<CellState>>();
+            for (int x = 0; x < w; ++x) {
+                List<CellState> row = new ArrayList<CellState>();
+                for (int y = 0; y < h; ++y) {
+                    row.add(cellsArr[x][y]);
+                }
+                cells.add(row);
+            }
+            
+            field = new FieldState(field.getName(), size, cells);
+            
+            // プレイヤー人数
+            int n = Receiver.readInt32(bis);
+            
+            // プレイヤー
+            for (int i = 0; i < n; ++i) {
+                // 位置
+                int x = Receiver.readInt32(bis);
+                int y = Receiver.readInt32(bis);
+                Point pos = new Point(x, y);
+                
+                // 向き
+                Direction dir;
+                switch (bis.read()) {
+                case 0: dir = Direction.RIGHT; break;
+                case 1: dir = Direction.RIGHT_UP; break;
+                case 2: dir = Direction.UP; break;
+                case 3: dir = Direction.LEFT_UP; break;
+                case 4: dir = Direction.LEFT; break;
+                case 5: dir = Direction.LEFT_DOWN; break;
+                case 6: dir = Direction.DOWN; break;
+                case 7: dir = Direction.RIGHT_DOWN; break;
+                default: dir = Direction.RIGHT; break;
+                }
+                
+                // 生死
+                boolean alive = (bis.read() == 0);
+                
+                players[i] = new PlayerState(players[i].getName(), players[i].getColor(), pos, dir, alive);
+            }
         }
-        
-        field = new FieldState(field.getName(), size, cells);
-        
-        // プレイヤー人数
-        int n = Receiver.readInt32(bis);
-        
-        // プレイヤー
-        for (int i = 0; i < n; ++i) {
-            // 位置
-            int x = Receiver.readInt32(bis);
-            int y = Receiver.readInt32(bis);
-            Point pos = new Point(x, y);
-            
-            // 向き
-            Direction dir;
-            switch (bis.read()) {
-            case 0: dir = Direction.RIGHT; break;
-            case 1: dir = Direction.RIGHT_UP; break;
-            case 2: dir = Direction.UP; break;
-            case 3: dir = Direction.LEFT_UP; break;
-            case 4: dir = Direction.LEFT; break;
-            case 5: dir = Direction.LEFT_DOWN; break;
-            case 6: dir = Direction.DOWN; break;
-            case 7: dir = Direction.RIGHT_DOWN; break;
-            default: dir = Direction.RIGHT; break;
-            }
-            
-            // 生死
-            boolean alive = (bis.read() == 0);
-            
-            players[i] = new PlayerState(players[i].getName(), players[i].getColor(), pos, dir, alive);
+        catch (IOException ex) {
+            // ByteArrayInputStream.read() の呼び出しなので IO エラーは発生しない
         }
     }
     
     /**
      * 受信データからゲームの結果を設定する。
      * @param data 受信データのバイト列
-     * @throws IOException
      */
-    public void setGameResult(byte[] data) throws IOException {
+    public void setGameResult(byte[] data) {
         ByteArrayInputStream bis = new ByteArrayInputStream(data);
         
-        // フィールドサイズ
-        int w = Receiver.readInt32(bis);
-        int h = Receiver.readInt32(bis);
-        Size size = new Size(w, h);
-        
-        // セル
-        CellState[][] cellsArr = new CellState[w][h];
-        for (int y = 0; y < h; ++y) {
-            for (int x = 0; x < w; ++x) {
-                // 通行可能フラグ
-                boolean passable = (bis.read() != 0);
-                
-                // 色
-                int r = bis.read();
-                int g = bis.read();
-                int b = bis.read();
-                Color color = new Color(r, g, b);
-                
-                cellsArr[x][y] = new CellState(passable, color);
-            }
-        }
-        List<List<CellState>> cells = new ArrayList<List<CellState>>();
-        for (int x = 0; x < w; ++x) {
-            List<CellState> row = new ArrayList<CellState>();
+        try {
+            // フィールドサイズ
+            int w = Receiver.readInt32(bis);
+            int h = Receiver.readInt32(bis);
+            Size size = new Size(w, h);
+            
+            // セル
+            CellState[][] cellsArr = new CellState[w][h];
             for (int y = 0; y < h; ++y) {
-                row.add(cellsArr[x][y]);
+                for (int x = 0; x < w; ++x) {
+                    // 通行可能フラグ
+                    boolean passable = (bis.read() != 0);
+                    
+                    // 色
+                    int r = bis.read();
+                    int g = bis.read();
+                    int b = bis.read();
+                    Color color = new Color(r, g, b);
+                    
+                    cellsArr[x][y] = new CellState(passable, color);
+                }
             }
-            cells.add(row);
-        }
-        
-        field = new FieldState(field.getName(), size, cells);
-        
-        // プレイヤー人数
-        int n = Receiver.readInt32(bis);
-        
-        // プレイヤー
-        for (int i = 0; i < n; ++i) {
-            // 位置
-            int x = Receiver.readInt32(bis);
-            int y = Receiver.readInt32(bis);
-            Point pos = new Point(x, y);
-            
-            // 向き
-            Direction dir;
-            switch (bis.read()) {
-            case 0: dir = Direction.RIGHT; break;
-            case 1: dir = Direction.RIGHT_UP; break;
-            case 2: dir = Direction.UP; break;
-            case 3: dir = Direction.LEFT_UP; break;
-            case 4: dir = Direction.LEFT; break;
-            case 5: dir = Direction.LEFT_DOWN; break;
-            case 6: dir = Direction.DOWN; break;
-            case 7: dir = Direction.RIGHT_DOWN; break;
-            default: dir = Direction.RIGHT; break;
+            List<List<CellState>> cells = new ArrayList<List<CellState>>();
+            for (int x = 0; x < w; ++x) {
+                List<CellState> row = new ArrayList<CellState>();
+                for (int y = 0; y < h; ++y) {
+                    row.add(cellsArr[x][y]);
+                }
+                cells.add(row);
             }
             
-            // 生死
-            boolean alive = (bis.read() == 0);
+            field = new FieldState(field.getName(), size, cells);
             
-            players[i] = new PlayerState(players[i].getName(), players[i].getColor(), pos, dir, alive);
+            // プレイヤー人数
+            int n = Receiver.readInt32(bis);
+            
+            // プレイヤー
+            for (int i = 0; i < n; ++i) {
+                // 位置
+                int x = Receiver.readInt32(bis);
+                int y = Receiver.readInt32(bis);
+                Point pos = new Point(x, y);
+                
+                // 向き
+                Direction dir;
+                switch (bis.read()) {
+                case 0: dir = Direction.RIGHT; break;
+                case 1: dir = Direction.RIGHT_UP; break;
+                case 2: dir = Direction.UP; break;
+                case 3: dir = Direction.LEFT_UP; break;
+                case 4: dir = Direction.LEFT; break;
+                case 5: dir = Direction.LEFT_DOWN; break;
+                case 6: dir = Direction.DOWN; break;
+                case 7: dir = Direction.RIGHT_DOWN; break;
+                default: dir = Direction.RIGHT; break;
+                }
+                
+                // 生死
+                boolean alive = (bis.read() == 0);
+                
+                players[i] = new PlayerState(players[i].getName(), players[i].getColor(), pos, dir, alive);
+            }
+            
+            // 順位
+            rank = new int[n];
+            for (int i = 0; i < n; ++i) {
+                rank[i] = Receiver.readInt32(bis);
+            }
+            
+            // ゲームオーバー
+            gameover = true;
         }
-        
-        // 順位
-        rank = new int[n];
-        for (int i = 0; i < n; ++i) {
-            rank[i] = Receiver.readInt32(bis);
+        catch (IOException ex) {
+            // ByteArrayInputStream.read() の呼び出しなので IO エラーは発生しない
         }
-        
-        // ゲームオーバー
-        gameover = true;
     }
     
     private String myName;
