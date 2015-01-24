@@ -17,8 +17,8 @@ public class SuperSnakeClient implements AutoCloseable {
      * 接続の確立、プレイヤー情報の送信、ゲーム情報の受信を行う.
      * @param host 接続先ホスト名
      * @param port 接続先ポート番号
-     * @throws IOException
-     * @throws InterruptedException
+     * @throws IOException ソケット等での入出力エラー発生時に発生する.
+     * @throws InterruptedException 割り込み発生時に発生する.
      */
     public void connect(String host, int port) throws IOException, InterruptedException {
         // 接続
@@ -44,10 +44,10 @@ public class SuperSnakeClient implements AutoCloseable {
     /**
      * 次のターンが開始するまで待機する.
      * ゲームの状態またはゲームの結果を受信するまで待機する.
-     * @throws InterruptedException
-     * @throws IOException
+     * @throws InterruptedException 割り込み発生時に発生する.
+     * @throws SocketException サーバーとの通信が切断された場合に発生する.
      */
-    public void waitForNextTurn() throws InterruptedException, IOException {
+    public void waitForNextTurn() throws InterruptedException, SocketException {
         do {
             receiver.beginReceive();
             while (!receiver.isReceived()) {
@@ -63,9 +63,8 @@ public class SuperSnakeClient implements AutoCloseable {
     
     /**
      * 次の行動を決定する.
-     * @throws IOException
      */
-    public void decideAction() throws IOException {
+    public void decideAction() {
         Action action = player.think(data.getGameState());
         sender.beginSend(DataType.ANSWER, data.getActionBytes(action));
     }

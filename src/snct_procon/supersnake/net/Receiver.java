@@ -2,6 +2,7 @@ package snct_procon.supersnake.net;
 
 import java.io.*;
 import java.nio.*;
+import java.net.*;
 
 /**
  * SuperSnake でのデータ受信全般を行う.
@@ -25,6 +26,7 @@ public class Receiver {
             return;
         }
         
+        socketEx = null;
         th = new ReceivingThread(this);
         received = false;
         new Thread(th).start();
@@ -33,8 +35,12 @@ public class Receiver {
     /**
      * データの受信が完了したか否かを取得する.
      * @return データの受信が完了していれば true 、そうでなければ false
+     * @throws SocketException Socket が切断された場合に発生する.
      */
-    public boolean isReceived() {
+    public boolean isReceived() throws SocketException {
+        if (socketEx != null) {
+            throw socketEx;
+        }
         return received;
     }
     
@@ -127,7 +133,10 @@ public class Receiver {
                     }
                 } 
             }
-            catch (IOException ex) {
+            catch (SocketException ex) {
+                receiver.socketEx = ex;
+            }
+            catch (IOException ex) { 
             }
             finally {
                 // 受信処理終了
@@ -143,4 +152,5 @@ public class Receiver {
     private volatile DataType dataType = DataType.UNKNOWN;
     private volatile byte[] data = new byte[0];
     private volatile boolean received = false;
+    private volatile SocketException socketEx = null;
 }

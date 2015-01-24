@@ -1,6 +1,7 @@
 
 import snct_procon.supersnake.*;
 import java.io.*;
+import java.net.*;
 
 public class SuperSnakeClientMain {
 
@@ -34,6 +35,9 @@ public class SuperSnakeClientMain {
                     client.decideAction();
                 }
             }
+        }
+        catch (SocketException ex) {
+            System.err.println("サーバーとの通信が切断されました。");
         }
     }
 
