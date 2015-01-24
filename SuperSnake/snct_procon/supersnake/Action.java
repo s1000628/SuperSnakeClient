@@ -6,7 +6,7 @@ package snct_procon.supersnake;
 public enum Action {
     
     /**
-     * íºêi.
+     * íºêiÇ∑ÇÈ.
      */
     STRAIGHT,
     

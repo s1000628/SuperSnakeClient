@@ -10,7 +10,7 @@ public class Receiver {
     
     /**
      * Receiver を初期化する.
-     * @param stream
+     * @param stream Socket の InputStream
      */
     public Receiver(InputStream stream) {
         this.stream = stream;
@@ -58,7 +58,7 @@ public class Receiver {
     
     /**
      * 受信したデータから数値を取り出す.
-     * @param steram 受信したデータの InputStream
+     * @param stream 受信したデータの InputStream
      * @return 受信した数値
      * @throws IOException
      */
