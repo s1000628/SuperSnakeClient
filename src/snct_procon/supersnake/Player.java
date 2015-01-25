@@ -8,9 +8,10 @@ public abstract class Player {
      * ゲームの状態からプレイヤーの行動を決定する.
      * サブクラスで実装する必要がある.
      * @param state ゲームの状態
+     * @param myPlayerNumber 自分のプレイヤー番号
      * @return プレイヤーの行動
      */
-    public abstract Action think(GameState state);
+    public abstract Action think(GameState state, int myPlayerNumber);
     
     /**
      * プレイヤーを初期化する.
@@ -27,8 +28,9 @@ public abstract class Player {
      * プレイヤーの生死に関わらず、毎ターンの始めに呼び出される.
      * サブクラスでオーバーライドすれば、自由な形式で表示できる.
      * @param state ゲームの状態
+     * @param myPlayerNumber 自分のプレイヤー番号
      */
-    public void showGameState(GameState state) {
+    public void showGameState(GameState state, int myPlayerNumber) {
         // フィールドの状態
         System.out.println("[ Field ]");
         showField(state);
@@ -51,9 +53,10 @@ public abstract class Player {
      * ゲームの結果を表示する.
      * サブクラスでオーバーライドすれば、自由な形式で表示できる.
      * @param state ゲームの状態
+     * @param myPlayerNumber 自分のプレイヤー番号
      * @param rank 各プレイヤーの順位
      */
-    public void showResult(GameState state, List<Integer> rank) {
+    public void showResult(GameState state, int myPlayerNumber, List<Integer> rank) {
         // フィールドの状態
         System.out.println("[ Field ]");
         showField(state);

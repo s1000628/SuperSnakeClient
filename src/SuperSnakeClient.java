@@ -94,7 +94,7 @@ public class SuperSnakeClient implements AutoCloseable {
      * Ÿ‚Ìs“®‚ğŒˆ’è‚·‚é.
      */
     public void decideAction() {
-        Action action = player.think(data.getGameState());
+        Action action = player.think(data.getGameState(), data.getMyPlayerNumber());
         sender.beginSend(DataType.ANSWER, data.getActionBytes(action));
     }
     
@@ -102,7 +102,7 @@ public class SuperSnakeClient implements AutoCloseable {
      * ƒQ[ƒ€‚Ìó‘Ô‚ğ•\¦‚·‚é.
      */
     public void showGameState() {
-        player.showGameState(data.getGameState());
+        player.showGameState(data.getGameState(), data.getMyPlayerNumber());
     }
     
     /**
@@ -114,7 +114,7 @@ public class SuperSnakeClient implements AutoCloseable {
         for (int i = 0; i < data.getPlayersCount(); ++i) {
             rank.add(data.getRank(i));
         }
-        player.showResult(data.getGameState(), rank);
+        player.showResult(data.getGameState(), data.getMyPlayerNumber(), rank);
     }
 
     /**

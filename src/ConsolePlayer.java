@@ -18,7 +18,7 @@ public class ConsolePlayer extends Player {
      * •W€“ü—Í‚©‚ç‚Ì“ü—Í‚É‚æ‚Á‚Äs“®‚ğŒˆ’è‚·‚é.
      */
     @Override
-    public Action think(GameState state) {
+    public Action think(GameState state, int myPlayerNumber) {
         // s“®‚ğ“ü—Í
         System.out.println("[ Action ]");
         Action action = Action.STRAIGHT;
