@@ -2,12 +2,21 @@
 import java.io.*;
 import snct_procon.supersnake.*;
 
+/**
+ * 標準入力によって操作可能なプレイヤー.
+ */
 public class ConsolePlayer extends Player {
     
+    /**
+     * ConsolePlayer を初期化する.
+     */
     public ConsolePlayer() {
         super("Java太郎", new Color(0, 255, 0));
     }
 
+    /**
+     * 標準入力からの入力によって行動を決定する.
+     */
     @Override
     public Action think(GameState state) {
         // 行動を入力

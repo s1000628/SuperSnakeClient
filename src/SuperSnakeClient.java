@@ -6,6 +6,9 @@ import java.util.*;
 import snct_procon.supersnake.*;
 import snct_procon.supersnake.net.*;
 
+/**
+ * SuperSnake のクライアント.
+ */
 public class SuperSnakeClient implements AutoCloseable {
     
     /**
@@ -13,6 +16,10 @@ public class SuperSnakeClient implements AutoCloseable {
      */
     public final int defaultPort = 12345;
     
+    /**
+     * SuperSnakeClient を初期化する.
+     * @param player 使用するプレイヤー
+     */
     public SuperSnakeClient(Player player) {
         this.player = player;
     }
